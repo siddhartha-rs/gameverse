@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaming Hub | Play Free Games Online</title>
+  <meta name="description"
+    content="Gaming Hub offers fun and free online games. Play instantly in your browser and support us with donations.">
+  <meta name="keywords" content="gaming hub, free games, play online, browser games, addictive games">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gaminghub.example/">
+  <meta property="og:title" content="Gaming Hub | Play Free Games Online">
+  <meta property="og:description"
+    content="Gaming Hub offers fun and free online games. Play instantly in your browser.">
+  <meta property="og:image" content="https://gaminghub.example/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://gaminghub.example/">
+  <meta property="twitter:title" content="Gaming Hub | Play Free Games Online">
+  <meta property="twitter:description"
+    content="Gaming Hub offers fun and free online games. Play instantly in your browser.">
+  <meta property="twitter:image" content="https://gaminghub.example/twitter-image.jpg">
+
+  <script
+    src="https://www.paypal.com/sdk/js?client-id=BAAYqJ5mZ1dpSyINsYo6Ixkmh8uPMNmr64jP-JCcQjFWXaEaNncOdDEFVQ2F8XCXQH9oQsqN1lynW5eLmA&components=hosted-buttons&disable-funding=venmo&currency=USD">
+    </script>
+
+  <!-- Favicon -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Gaming Hub",
+      "url": "https://gaminghub.example",
+      "logo": "https://gaminghub.example/logo.png",
+      "sameAs": [
+        "https://twitter.com/gaminghub",
+        "https://facebook.com/gaminghub",
+        "https://instagram.com/gaminghub"
+      ]
+    }
+    </script>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Gaming Hub",
+      "url": "https://gaminghub.example/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://gaminghub.example/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+  <style>
+    /* CSS Variables for Theming - Dark mode by default */
+    :root {
+      --primary-color: #6c5ce7;
+      --secondary-color: #a29bfe;
+      --accent-color: #fd79a8;
+      --text-color: #f8f9fa;
+      --bg-color: #121212;
+      --card-bg: rgba(30, 30, 30, 0.8);
+      --header-bg: rgba(18, 18, 18, 0.95);
+      --footer-bg: #000000;
+      --footer-text: #f8f9fa;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      --transition: all 0.3s ease;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    .light-mode {
+      --primary-color: #6c5ce7;
+      --secondary-color: #a29bfe;
+      --accent-color: #fd79a8;
+      --text-color: #333;
+      --bg-color: #f8f9fa;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --header-bg: rgba(255, 255, 255, 0.95);
+      --footer-bg: #343a40;
+      --footer-text: #f8f9fa;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --glass-bg: rgba(0, 0, 0, 0.1);
+      --glass-border: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      transition: var(--transition);
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .section {
+      padding: 5rem 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: var(--primary-color);
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+      border-radius: 2px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Glass effect utility class */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    /* Header Styles */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--header-bg);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo svg {
+      margin-right: 0.5rem;
+      width: 30px;
+      height: 30px;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-list {
+      display: flex;
+      margin-right: 1.5rem;
+    }
+
+    .nav-item {
+      margin-left: 1.5rem;
+    }
+
+    .nav-link {
+      font-weight: 600;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-color);
+      transition: var(--transition);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-link:hover {
+      color: var(--primary-color);
+    }
+
+    .theme-toggle {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 1rem;
+      transition: var(--transition);
+    }
+
+    .theme-toggle:hover {
+      background: var(--primary-color);
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      transition: var(--transition);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 21px;
+      cursor: pointer;
+      margin-left: 1.5rem;
+    }
+
+    .hamburger span {
+      height: 3px;
+      width: 100%;
+      background-color: var(--text-color);
+      border-radius: 3px;
+      transition: var(--transition);
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.2), transparent);
+    }
+
+    /* Stars background */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle linear infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: 0.2;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    /* Spaceship animation */
+    .spaceship {
+      position: absolute;
+      width: 120px;
+      height: 60px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Cpath d='M60,5 L5,30 L60,55 L115,30 Z' fill='%236c5ce7'/%3E%3Ccircle cx='60' cy='30' r='10' fill='%23a29bfe'/%3E%3Cpath d='M70,25 L90,20 L90,40 L70,35 Z' fill='%23fd79a8'/%3E%3C/svg%3E") no-repeat;
+      background-size: contain;
+      animation: fly 20s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(108, 92, 231, 0.7));
+    }
+
+    @keyframes fly {
+      0% {
+        top: 20%;
+        left: -10%;
+        transform: rotate(10deg);
+      }
+
+      25% {
+        top: 70%;
+        left: 25%;
+        transform: rotate(-5deg);
+      }
+
+      50% {
+        top: 30%;
+        left: 60%;
+        transform: rotate(5deg);
+      }
+
+      75% {
+        top: 75%;
+        left: 85%;
+        transform: rotate(-8deg);
+      }
+
+      100% {
+        top: 20%;
+        left: 110%;
+        transform: rotate(10deg);
+      }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      padding: 0 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    /* Games Section */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      transform: translateY(0);
+    }
+
+    .game-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .game-img {
+      height: 200px;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-img::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,0 L100,0 L100,100 L0,100 Z'%3E%3C/path%3E%3C/svg%3E");
+      background-size: 50px 50px;
+    }
+
+    .game-content {
+      padding: 1.5rem;
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-desc {
+      margin-bottom: 1.5rem;
+      color: #ccc;
+    }
+
+    .light-mode .game-desc {
+      color: #666;
+    }
+
+    /* Donate Section */
+    .donate {
+      text-align: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .donate-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .donate-desc {
+      margin-bottom: 2rem;
+    }
+
+    .donate-btn {
+      background: linear-gradient(45deg, #0070ba, #005ea6);
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+
+    /* About Section */
+    .about-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .about-desc {
+      margin-bottom: 1.5rem;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--footer-bg);
+      color: var(--footer-text);
+      padding: 3rem 0 1.5rem;
+    }
+
+    .footer-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-logo svg {
+      margin-right: 0.5rem;
+      width: 30px;
+      height: 30px;
+    }
+
+    .footer-links h3,
+    .footer-social h3 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .social-icon:hover {
+      background-color: var(--primary-color);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsive Styles */
+    @media screen and (max-width: 768px) {
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.2rem;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-list {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        background-color: var(--header-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        width: 100%;
+        flex-direction: column;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        padding: 2rem 0;
+        z-index: 999;
+      }
+
+      .nav-list.active {
+        left: 0;
+      }
+
+      .nav-item {
+        margin: 1.5rem 0;
+      }
+
+      .theme-toggle {
+        margin-left: 0;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .section {
+        padding: 3rem 0;
+      }
+
+      .spaceship {
+        width: 80px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body class="dark-mode">
+  <!-- Header -->
+  <header>
+    <div class="nav-container container">
+      <a href="#" class="logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21 6H3C2.44772 6 2 6.44772 2 7V17C2 17.5523 2.44772 18 3 18H21C21.5523 18 22 17.5523 22 17V7C22 6.44772 21.5523 6 21 6Z"
+            stroke="currentColor" stroke-width="2" />
+          <path
+            d="M15 13C15 14.6569 13.6569 16 12 16C10.3431 16 9 14.6569 9 13C9 11.3431 10.3431 10 12 10C13.6569 10 15 11.3431 15 13Z"
+            stroke="currentColor" stroke-width="2" />
+          <path d="M16 8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        Gaming Hub
+      </a>
+
+      <div class="nav-menu">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+          <li class="nav-item"><a href="#games" class="nav-link">Games</a></li>
+          <li class="nav-item"><a href="#donate" class="nav-link">Donate</a></li>
+          <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+        </ul>
+
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light mode">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M12 2V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M12 20V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M4.93 4.93L6.34 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M17.66 17.66L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M2 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M20 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6.34 17.66L4.93 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M19.07 4.93L17.66 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+
+        <div class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="stars" id="stars"></div>
+    <div class="spaceship"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Welcome to Gaming Hub</h1>
+      <p class="hero-subtitle">Play free addictive games instantly</p>
+      <a href="#games" class="btn">Start Playing</a>
+    </div>
+  </section>
+
+  <!-- Games Section -->
+  <section id="games" class="section">
+    <div class="container">
+      <h2 class="section-title">Our Games</h2>
+
+      <div class="games-grid">
+        <!-- Game 1 -->
+        <article class="game-card" itemscope itemtype="https://schema.org/VideoGame">
+          <div class="game-img" itemprop="image" aria-label="Galaxy Defender">
+            <img src="images/galaxy_defender.png" alt="Galaxy Defender" />
+          </div>
+          <div class="game-content">
+            <h3 class="game-title" itemprop="name">Galaxy Defender</h3>
+            <p class="game-desc" itemprop="description">
+              Navigate through asteroid fields and battle alien ships in this exciting space shooter.
+            </p>
+            <a href="galaxy-defender.html" class="btn">Play Now</a>
+          </div>
+        </article>
+
+
+        <!-- Game 2 -->
+        <article class="game-card" itemscope itemtype="https://schema.org/VideoGame">
+          <div class="game-img" itemprop="image" aria-label="Minimal Aim Trainer">
+            Minimal Aim Trainer
+          </div>
+          <div class="game-content">
+            <h3 class="game-title" itemprop="name">Minimal Aim Trainer</h3>
+            <p class="game-desc" itemprop="description">Challenge your brain with hundreds of mind-bending puzzles and
+              problems.</p>
+            <a href="#" class="btn">Play Now</a>
+          </div>
+        </article>
+
+        <!-- Game 3 -->
+        <article class="game-card" itemscope itemtype="https://schema.org/VideoGame">
+          <div class="game-img" itemprop="image" aria-label="Racing Extreme Game Preview">
+            Racing Extreme
+          </div>
+          <div class="game-content">
+            <h3 class="game-title" itemprop="name">Racing Extreme</h3>
+            <p class="game-desc" itemprop="description">Experience high-speed adrenaline with the most realistic racing
+              game in browser.</p>
+            <a href="#" class="btn">Play Now</a>
+          </div>
+        </article>
+
+        <!-- Game 4 -->
+        <article class="game-card" itemscope itemtype="https://schema.org/VideoGame">
+          <div class="game-img" itemprop="image" aria-label="Word Challenge Game Preview">
+            Word Challenge
+          </div>
+          <div class="game-content">
+            <h3 class="game-title" itemprop="name">Word Challenge</h3>
+            <p class="game-desc" itemprop="description">Test your vocabulary and spelling skills in this addictive word
+              game.</p>
+            <a href="#" class="btn">Play Now</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Donate Section -->
+  <section id="donate" class="section donate">
+    <div class="container">
+      <h2 class="section-title">Support Gaming Hub</h2>
+
+      <div class="donate-content">
+        <p class="donate-desc">Your donations help us keep Gaming Hub free, maintain our servers, and develop new games.
+          Every contribution, big or small, makes a difference!</p>
+
+        <a href="https://www.paypal.com/ncp/payment/4V22HVMBJT8YL" class="btn donate-btn">Donate with PayPal</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title">About Gaming Hub</h2>
+
+      <div class="about-content">
+        <p class="about-desc">Gaming Hub is a platform dedicated to providing high-quality, free browser games that
+          everyone can enjoy. We believe that gaming should be accessible to all, without downloads, fees, or
+          restrictions.</p>
+
+        <p class="about-desc">Our team of developers works tirelessly to create engaging, innovative games that work
+          across all devices. From action-packed adventures to brain-teasing puzzles, we have something for every type
+          of gamer.</p>
+
+        <p class="about-desc">Founded in 2023, Gaming Hub has quickly grown to become a favorite destination for casual
+          gamers around the world. Our games are built with modern web technologies, ensuring smooth performance and
+          compatibility with all major browsers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-container">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M21 6H3C2.44772 6 2 6.44772 2 7V17C2 17.5523 2.44772 18 3 18H21C21.5523 18 22 17.5523 22 17V7C22 6.44772 21.5523 6 21 6Z"
+                stroke="currentColor" stroke-width="2" />
+              <path
+                d="M15 13C15 14.6569 13.6569 16 12 16C10.3431 16 9 14.6569 9 13C9 11.3431 10.3431 10 12 10C13.6569 10 15 11.3431 15 13Z"
+                stroke="currentColor" stroke-width="2" />
+              <path d="M16 8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Gaming Hub
+          </div>
+          <p>Your destination for free, high-quality browser games. Play anytime, anywhere!</p>
+        </div>
+
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="#donate">Donate</a></li>
+            <li><a href="#about">About</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-social">
+          <h3>Follow Us</h3>
+          <div class="social-icons">
+            <a href="#" class="social-icon" aria-label="Twitter">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+              </svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
+              </svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="copyright">
+        <p>&copy; 2023 Gaming Hub. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // DOM Elements
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const toggleIcon = themeToggleBtn.querySelector('svg');
+    const hamburger = document.getElementById('hamburger');
+    const navList = document.querySelector('.nav-list');
+    const starsContainer = document.getElementById('stars');
+
+    // Create stars for the background
+    function createStars() {
+      const starsCount = 150;
+
+      for (let i = 0; i < starsCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+
+        // Random position
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+
+        // Random size
+        const size = Math.random() * 3;
+
+        // Random animation duration
+        const duration = Math.random() * 5 + 5;
+
+        star.style.left = `${x}%`;
+        star.style.top = `${y}%`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.animationDuration = `${duration}s`;
+
+        starsContainer.appendChild(star);
+      }
+    }
+
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light-mode') {
+      document.body.classList.add('light-mode');
+      updateToggleIcon();
+    }
+
+    // Theme Toggle
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light-mode' : '');
+      updateToggleIcon();
+    });
+
+    // Update toggle icon based on current theme
+    function updateToggleIcon() {
+      if (document.body.classList.contains('light-mode')) {
+        // Switch to moon icon for light mode
+        themeToggleBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.9999 15.3298C19.534 15.7346 17.9999 15.5401 16.6589 14.7777C15.3179 14.0153 14.2599 12.7353 13.6929 11.1758C13.1258 9.61626 13.0888 7.87956 13.5899 6.2943C14.091 4.70903 15.095 3.37827 16.4199 2.5498C16.2038 2.51532 15.9862 2.49976 15.7684 2.50001C12.0749 2.50001 9.06836 5.50651 9.06836 9.20001C9.06836 12.8935 12.0749 15.9 15.7684 15.9C17.2462 15.9 18.6313 15.4725 19.7999 14.7375C20.0644 14.5713 20.311 14.3798 20.5374 14.1675C20.4484 14.5155 20.3949 14.8718 20.3784 15.2308C20.3618 15.5898 20.3824 15.9496 20.4399 16.3043L20.9999 15.3298Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+      } else {
+        // Switch to sun icon for dark mode
+        themeToggleBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 2V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 20V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4.93 4.93L6.34 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17.66 17.66L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6.34 17.66L4.93 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19.07 4.93L17.66 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+      }
+    }
+
+    // Mobile Menu Toggle
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navList.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navList.classList.remove('active');
+      });
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          const headerHeight = document.querySelector('header').offsetHeight;
+          const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Initialize stars and update toggle icon on load
+    window.addEventListener('DOMContentLoaded', () => {
+      createStars();
+      updateToggleIcon();
+    });
+  </script>
+</body>
+
+</html>
