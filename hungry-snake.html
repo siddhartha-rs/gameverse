@@ -448,6 +448,7 @@
       <div class="dpad">
         <div class="dpad-btn up">↑</div>
         <div class="dpad-btn left">←</div>
+        <div class="dpad-btn center"></div>
         <div class="dpad-btn right">→</div>
         <div class="dpad-btn down">↓</div>
       </div>
@@ -479,11 +480,11 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // Game Configuration
+    // Game Configuration - FIXED: Adjusted speed values to make snake slower
     const GRID_SIZE = 20;
-    const INITIAL_SPEED = 120;
-    const SPEED_INCREMENT = 2;
-    const MIN_SPEED = 50;
+    const INITIAL_SPEED = 200; // Increased from 120 to make snake slower
+    const SPEED_INCREMENT = 1;  // Reduced from 2 to make speed increases more gradual
+    const MIN_SPEED = 100;      // Increased from 50 to prevent snake from getting too fast
     const SHOW_GRID = true;
     const ENABLE_PARTICLES = true;
 
@@ -568,13 +569,11 @@
         if (e.target === howToPlayModal) showModal(false);
       });
 
-      // D-pad events for mobile
-      dpadButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const dir = btn.textContent;
-          handleDpadInput(dir);
-        });
-      });
+      // D-pad events for mobile - FIXED: Added proper direction handling
+      document.querySelector('.dpad-btn.up').addEventListener('click', () => handleDpadInput('↑'));
+      document.querySelector('.dpad-btn.down').addEventListener('click', () => handleDpadInput('↓'));
+      document.querySelector('.dpad-btn.left').addEventListener('click', () => handleDpadInput('←'));
+      document.querySelector('.dpad-btn.right').addEventListener('click', () => handleDpadInput('→'));
     }
 
     // Resize canvas to fit screen
