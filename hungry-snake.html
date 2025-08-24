@@ -349,6 +349,24 @@
         width: 40px;
         height: 40px;
       }
+
+      /* Responsive D-pad adjustments */
+      .mobile-controls {
+        max-width: 100%;
+        padding: 0 10px;
+      }
+
+      .dpad {
+        width: min(180px, 30vh, 40vw);
+        height: min(180px, 30vh, 40vw);
+        margin: 0 auto;
+        gap: min(8px, 1.5vw);
+      }
+
+      .dpad-btn {
+        font-size: min(24px, 5vw);
+        border-radius: min(12px, 2.5vw);
+      }
     }
 
     @media (max-width: 480px) {
@@ -369,6 +387,32 @@
       .btn-large {
         padding: 12px 30px;
         font-size: 1rem;
+      }
+
+      /* Additional small screen adjustments */
+      .dpad {
+        width: min(160px, 28vh, 38vw);
+        height: min(160px, 28vh, 38vw);
+      }
+
+      .dpad-btn {
+        font-size: min(20px, 4.5vw);
+      }
+    }
+
+    /* Extra small devices (phones in landscape) */
+    @media (max-height: 500px) and (max-width: 900px) {
+      .mobile-controls {
+        margin-top: 10px;
+      }
+
+      .dpad {
+        width: min(140px, 25vh, 35vw);
+        height: min(140px, 25vh, 35vw);
+      }
+
+      .dpad-btn {
+        font-size: min(18px, 4vw);
       }
     }
 
