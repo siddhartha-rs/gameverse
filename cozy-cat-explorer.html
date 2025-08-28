@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cozy Cat Explorer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #87CEEB, #FFB6C1);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    #gameContainer {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #gameCanvas {
+      border: 2px solid #8B4513;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      background: #87CEEB;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .ui-overlay {
+      position: absolute;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .score-display {
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 25px;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #8B4513;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .settings-btn {
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      font-size: 20px;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-controls {
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 20px;
+      pointer-events: auto;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #8B4513;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.1s;
+      user-select: none;
+    }
+
+    .control-btn:active {
+      transform: scale(0.95);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal h2 {
+      color: #8B4513;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .setting-item {
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider {
+      width: 120px;
+    }
+
+    .close-btn {
+      background: #8B4513;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-controls {
+        display: flex;
+      }
+    }
+
+    .chat-bubble {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #8B4513;
+      border-radius: 20px 20px 20px 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #8B4513;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+      z-index: 50;
+      transform: translate(-50%, -100%);
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .chat-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 20px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #8B4513;
+    }
+
+    .fade-in {
+      opacity: 1 !important;
+    }
+
+    .instructions {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 25px;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #8B4513;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: fadeInOut 8s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+
+      0%,
+      100% {
+        opacity: 0;
+      }
+
+      10%,
+      90% {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="gameContainer">
+    <canvas id="gameCanvas" width="1200" height="600"></canvas>
+
+    <div class="ui-overlay score-display">
+      <div>🐱 Score: <span id="score">0</span></div>
+      <div>Streak: <span id="streak">0</span></div>
+    </div>
+
+    <div class="ui-overlay settings-btn" onclick="openSettings()">⚙️</div>
+
+    <div class="ui-overlay mobile-controls">
+      <button class="control-btn" id="leftBtn">←</button>
+      <button class="control-btn" id="jumpBtn">↑</button>
+      <button class="control-btn" id="rightBtn">→</button>
+      <button class="control-btn" id="climbBtn" style="display: none;">🧗</button>
+    </div>
+
+    <div class="instructions">
+      🎮 Arrow keys or WASD to move • Space to jump/swim • W to climb<br>
+      Explore the infinite world and collect treasures! 🌟
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h2>🐱 Settings</h2>
+      <div class="setting-item">
+        <label>Master Volume:</label>
+        <input type="range" class="slider" id="masterVolume" min="0" max="100" value="50">
+      </div>
+      <div class="setting-item">
+        <label>ASMR Mode:</label>
+        <input type="checkbox" id="asmrMode">
+      </div>
+      <div class="setting-item">
+        <label>Particle Density:</label>
+        <input type="range" class="slider" id="particleDensity" min="0" max="100" value="50">
+      </div>
+      <div class="setting-item">
+        <label>Motion Intensity:</label>
+        <input type="range" class="slider" id="motionIntensity" min="0" max="100" value="50">
+      </div>
+      <div class="setting-item">
+        <label>World Seed:</label>
+        <input type="text" id="worldSeed" placeholder="Random">
+      </div>
+      <button class="close-btn" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Game constants
+    const CHUNK_SIZE = 32;
+    const TILE_SIZE = 20;
+    const WORLD_HEIGHT = 30;
+    const RENDER_DISTANCE = 3; // chunks
+
+    // Game state
+    let canvas, ctx;
+    let camera = { x: 0, y: 0 };
+    let chunks = new Map();
+    let loadedChunks = new Set();
+    let gameState = {
+      score: 0,
+      streak: 0,
+      time: 0,
+      seed: Math.random() * 1000000
+    };
+
+    // Cat object - FIXED: Start on the ground
+    let cat = {
+      x: 600,
+      y: 0, // Will be set to ground level after world generation
+      width: 24,
+      height: 20,
+      velX: 0,
+      velY: 0,
+      grounded: false,
+      climbing: false,
+      swimming: false,
+      facingRight: true,
+      animFrame: 0,
+      idleTimer: 0,
+      chatCooldown: 0,
+      lastMeow: 0
+    };
+
+    // Input state
+    let keys = {};
+    let mobileInput = {
+      left: false,
+      right: false,
+      jump: false,
+      climb: false
+    };
+
+    // Settings
+    let settings = {
+      masterVolume: 50,
+      asmrMode: false,
+      particleDensity: 50,
+      motionIntensity: 50
+    };
+
+    // Chat messages for the cat
+    const chatMessages = [
+      "Purr...", "I smell fish!", "This place feels calm...", "Shall we climb?",
+      "Meow!", "Adventure time!", "So peaceful here...", "Look, shiny things!",
+      "Perfect napping spot!", "The wind feels nice!", "I love exploring!",
+      "Soft grass under paws!", "Wonder what's ahead?", "Time for treats?",
+      "This view is purrfect!", "Feeling playful!", "Nature is amazing!",
+      "Let's keep going!", "So many smells!", "Beautiful day!"
+    ];
+
+    // Collectible types
+    const collectibles = [
+      { type: 'fish', emoji: '🐟', points: 10, rarity: 0.3 },
+      { type: 'berry', emoji: '🫐', points: 5, rarity: 0.5 },
+      { type: 'yarn', emoji: '🧶', points: 15, rarity: 0.2 },
+      { type: 'feather', emoji: '🪶', points: 8, rarity: 0.4 },
+      { type: 'milk', emoji: '🥛', points: 20, rarity: 0.1 }
+    ];
+
+    // Noise function for procedural generation
+    class SimplexNoise {
+      constructor(seed = 0) {
+        this.seed = seed;
+        this.grad3 = [[1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0], [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1], [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]];
+        this.p = [];
+        for (let i = 0; i < 256; i++) {
+          this.p[i] = Math.floor(this.random() * 256);
+        }
+        this.perm = [];
+        for (let i = 0; i < 512; i++) {
+          this.perm[i] = this.p[i & 255];
+        }
+      }
+
+      random() {
+        const x = Math.sin(this.seed++) * 10000;
+        return x - Math.floor(x);
+      }
+
+      noise2D(xin, yin) {
+        const F2 = 0.5 * (Math.sqrt(3.0) - 1.0);
+        const G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
+
+        let n0, n1, n2;
+        const s = (xin + yin) * F2;
+        const i = Math.floor(xin + s);
+        const j = Math.floor(yin + s);
+        const t = (i + j) * G2;
+        const X0 = i - t;
+        const Y0 = j - t;
+        const x0 = xin - X0;
+        const y0 = yin - Y0;
+
+        let i1, j1;
+        if (x0 > y0) { i1 = 1; j1 = 0; }
+        else { i1 = 0; j1 = 1; }
+
+        const x1 = x0 - i1 + G2;
+        const y1 = y0 - j1 + G2;
+        const x2 = x0 - 1.0 + 2.0 * G2;
+        const y2 = y0 - 1.0 + 2.0 * G2;
+
+        const ii = i & 255;
+        const jj = j & 255;
+        const gi0 = this.perm[ii + this.perm[jj]] % 12;
+        const gi1 = this.perm[ii + i1 + this.perm[jj + j1]] % 12;
+        const gi2 = this.perm[ii + 1 + this.perm[jj + 1]] % 12;
+
+        let t0 = 0.5 - x0 * x0 - y0 * y0;
+        if (t0 < 0) n0 = 0.0;
+        else {
+          t0 *= t0;
+          n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0);
+        }
+
+        let t1 = 0.5 - x1 * x1 - y1 * y1;
+        if (t1 < 0) n1 = 0.0;
+        else {
+          t1 *= t1;
+          n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1);
+        }
+
+        let t2 = 0.5 - x2 * x2 - y2 * y2;
+        if (t2 < 0) n2 = 0.0;
+        else {
+          t2 *= t2;
+          n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2);
+        }
+
+        return 70.0 * (n0 + n1 + n2);
+      }
+
+      dot(g, x, y) {
+        return g[0] * x + g[1] * y;
+      }
+    }
+
+    let noise = new SimplexNoise(gameState.seed);
+
+    // Chunk generation
+    function generateChunk(chunkX) {
+      const chunk = {
+        x: chunkX,
+        tiles: [],
+        collectibles: [],
+        decorations: []
+      };
+
+      // Generate terrain
+      for (let x = 0; x < CHUNK_SIZE; x++) {
+        const worldX = chunkX * CHUNK_SIZE + x;
+        const heightNoise = noise.noise2D(worldX * 0.01, 0);
+        const biomeNoise = noise.noise2D(worldX * 0.005, 100);
+
+        const baseHeight = WORLD_HEIGHT * 0.7;
+        const height = Math.floor(baseHeight + heightNoise * 8);
+
+        // Determine biome
+        let biome = 'grass';
+        if (biomeNoise < -0.3) biome = 'water';
+        else if (biomeNoise > 0.3) biome = 'mountain';
+        else if (biomeNoise > 0.1) biome = 'forest';
+
+        // Generate column
+        const column = [];
+        for (let y = 0; y < WORLD_HEIGHT; y++) {
+          if (y > height) {
+            if (biome === 'water' && y <= height + 3) {
+              column[y] = 'water';
+            } else {
+              column[y] = 'air';
+            }
+          } else if (y === height) {
+            column[y] = biome === 'water' ? 'water' : (biome === 'mountain' ? 'stone' : 'grass');
+          } else {
+            column[y] = biome === 'mountain' ? 'stone' : 'dirt';
+          }
+        }
+        chunk.tiles[x] = column;
+
+        // Add climbable vines in forest areas
+        if (biome === 'forest' && Math.random() < 0.15) {
+          const vineHeight = Math.floor(Math.random() * 5) + 3;
+          for (let i = 0; i < vineHeight && height - i >= 0; i++) {
+            column[height - i] = 'vine';
+          }
+        }
+
+        // Add collectibles
+        if (Math.random() < 0.08) {
+          const collectible = collectibles[Math.floor(Math.random() * collectibles.length)];
+          if (Math.random() < collectible.rarity) {
+            chunk.collectibles.push({
+              x: worldX,
+              y: height - 1,
+              type: collectible.type,
+              emoji: collectible.emoji,
+              points: collectible.points,
+              collected: false
+            });
+          }
+        }
+
+        // Add decorations
+        if (Math.random() < 0.12) {
+          const decorations = ['🌸', '🍄', '🌺', '🌻', '🦋'];
+          chunk.decorations.push({
+            x: worldX,
+            y: height - 1,
+            emoji: decorations[Math.floor(Math.random() * decorations.length)]
+          });
+        }
+      }
+
+      return chunk;
+    }
+
+    // Chunk management
+    function updateChunks() {
+      const centerChunkX = Math.floor(camera.x / (CHUNK_SIZE * TILE_SIZE));
+      const chunksToLoad = new Set();
+      const chunksToKeep = new Set();
+
+      // Determine which chunks should be loaded
+      for (let dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
+        const chunkX = centerChunkX + dx;
+        chunksToLoad.add(chunkX);
+        chunksToKeep.add(chunkX);
+      }
+
+      // Load new chunks
+      chunksToLoad.forEach(chunkX => {
+        if (!chunks.has(chunkX)) {
+          chunks.set(chunkX, generateChunk(chunkX));
+        }
+      });
+
+      // Unload distant chunks
+      chunks.forEach((chunk, chunkX) => {
+        if (!chunksToKeep.has(chunkX)) {
+          chunks.delete(chunkX);
+        }
+      });
+    }
+
+    // Get tile at world position
+    function getTileAt(worldX, worldY) {
+      const chunkX = Math.floor(worldX / CHUNK_SIZE);
+      const chunk = chunks.get(chunkX);
+      if (!chunk) return 'air';
+
+      const localX = Math.floor(worldX) - chunkX * CHUNK_SIZE;
+      if (localX < 0 || localX >= CHUNK_SIZE || worldY < 0 || worldY >= WORLD_HEIGHT) return 'air';
+
+      return chunk.tiles[localX] ? chunk.tiles[localX][Math.floor(worldY)] || 'air' : 'air';
+    }
+
+    // IMPROVED: Collision detection
+    function checkCollision(x, y, width, height) {
+      const left = Math.floor(x / TILE_SIZE);
+      const right = Math.floor((x + width) / TILE_SIZE);
+      const top = Math.floor(y / TILE_SIZE);
+      const bottom = Math.floor((y + height) / TILE_SIZE);
+
+      for (let tx = left; tx <= right; tx++) {
+        for (let ty = top; ty <= bottom; ty++) {
+          const tile = getTileAt(tx, ty);
+          if (tile === 'grass' || tile === 'dirt' || tile === 'stone') {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    // IMPROVED: Find ground height at a position
+    function findGroundHeight(x) {
+      const worldX = Math.floor(x / TILE_SIZE);
+      for (let y = WORLD_HEIGHT - 1; y >= 0; y--) {
+        const tile = getTileAt(worldX, y);
+        if (tile === 'grass' || tile === 'dirt' || tile === 'stone') {
+          return y * TILE_SIZE;
+        }
+      }
+      return (WORLD_HEIGHT - 1) * TILE_SIZE; // Fallback
+    }
+
+    // Physics update
+    function updatePhysics() {
+      const GRAVITY = 0.5;
+      const GROUND_FRICTION = 0.8;
+      const AIR_FRICTION = 0.95;
+      const JUMP_FORCE = -12;
+      const MOVE_SPEED = 3;
+      const CLIMB_SPEED = 2;
+      const SWIM_SPEED = 1.5;
+
+      // Handle input
+      let moveX = 0;
+      if (keys['ArrowLeft'] || keys['a'] || keys['A'] || mobileInput.left) {
+        moveX = -MOVE_SPEED;
+        cat.facingRight = false;
+      }
+      if (keys['ArrowRight'] || keys['d'] || keys['D'] || mobileInput.right) {
+        moveX = MOVE_SPEED;
+        cat.facingRight = true;
+      }
+
+      // Check if cat is swimming
+      const catCenterX = (cat.x + cat.width / 2) / TILE_SIZE;
+      const catCenterY = (cat.y + cat.height / 2) / TILE_SIZE;
+      cat.swimming = getTileAt(catCenterX, catCenterY) === 'water';
+
+      // Check if cat can climb
+      const climbTile = getTileAt(catCenterX, catCenterY - 0.5);
+      const canClimb = climbTile === 'vine' || (climbTile === 'stone' && !cat.grounded);
+
+      // Show/hide climb button
+      const climbBtn = document.getElementById('climbBtn');
+      if (window.innerWidth <= 768) {
+        climbBtn.style.display = canClimb ? 'block' : 'none';
+      }
+
+      if (cat.swimming) {
+        // Swimming physics
+        cat.velX = moveX * SWIM_SPEED;
+        if (keys[' '] || keys['w'] || keys['W'] || mobileInput.jump) {
+          cat.velY = Math.max(cat.velY - 0.3, -4);
+        } else {
+          cat.velY += GRAVITY * 0.3; // Reduced gravity in water
+        }
+        cat.velY = Math.max(cat.velY, -4); // Terminal velocity in water
+        cat.climbing = false;
+      } else if (canClimb && (keys['w'] || keys['W'] || mobileInput.climb)) {
+        // Climbing physics
+        cat.climbing = true;
+        cat.velX = moveX * CLIMB_SPEED;
+        cat.velY = -CLIMB_SPEED;
+      } else {
+        // Normal physics
+        cat.climbing = false;
+        cat.velX = moveX;
+
+        // Jumping
+        if ((keys[' '] || mobileInput.jump) && cat.grounded) {
+          cat.velY = JUMP_FORCE;
+          cat.grounded = false;
+        }
+
+        // Apply gravity
+        if (!cat.grounded && !cat.climbing) {
+          cat.velY += GRAVITY;
+        }
+      }
+
+      // Apply friction
+      if (cat.grounded && !cat.swimming) {
+        cat.velX *= GROUND_FRICTION;
+      } else if (!cat.climbing) {
+        cat.velX *= AIR_FRICTION;
+      }
+
+      // Update position with collision detection
+      // Horizontal movement
+      cat.x += cat.velX;
+      if (checkCollision(cat.x, cat.y, cat.width, cat.height)) {
+        cat.x -= cat.velX;
+        cat.velX = 0;
+      }
+
+      // Vertical movement
+      cat.y += cat.velY;
+      if (checkCollision(cat.x, cat.y, cat.width, cat.height)) {
+        if (cat.velY > 0) {
+          cat.grounded = true;
+        }
+        cat.y -= cat.velY;
+        cat.velY = 0;
+      } else {
+        cat.grounded = false;
+      }
+
+      // IMPROVED: Ensure cat doesn't fall through the world
+      if (cat.y > (WORLD_HEIGHT - 1) * TILE_SIZE) {
+        cat.y = (WORLD_HEIGHT - 1) * TILE_SIZE - cat.height;
+        cat.velY = 0;
+        cat.grounded = true;
+      }
+
+      // Update camera to follow cat
+      camera.x = cat.x - canvas.width / 2;
+      camera.y = cat.y - canvas.height / 2 + 100; // Slight upward offset
+
+      // Update animation
+      if (Math.abs(cat.velX) > 0.1 || !cat.grounded) {
+        cat.animFrame += 0.2;
+      } else {
+        cat.idleTimer++;
+      }
+
+      // Trigger random chat messages
+      cat.chatCooldown--;
+      if (cat.chatCooldown <= 0 && (cat.idleTimer > 180 || Math.random() < 0.001)) {
+        showChatBubble();
+        cat.chatCooldown = Math.random() * 600 + 300; // 5-15 seconds
+        cat.idleTimer = 0;
+      }
+
+      // Random meows
+      if (Date.now() - cat.lastMeow > 10000 && Math.random() < 0.002) {
+        playMeow();
+        cat.lastMeow = Date.now();
+      }
+    }
+
+    // Collectible system
+    function updateCollectibles() {
+      chunks.forEach(chunk => {
+        chunk.collectibles.forEach(collectible => {
+          if (!collectible.collected) {
+            const dx = (collectible.x * TILE_SIZE) - (cat.x + cat.width / 2);
+            const dy = (collectible.y * TILE_SIZE) - (cat.y + cat.height / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 25) {
+              collectible.collected = true;
+              gameState.score += collectible.points;
+              gameState.streak++;
+              updateUI();
+
+              // Show collection message
+              setTimeout(() => {
+                const messages = [`Found ${collectible.type}!`, `Yummy ${collectible.type}!`, `Lucky find!`];
+                showChatBubble(messages[Math.floor(Math.random() * messages.length)]);
+              }, 500);
+            }
+          }
+        });
+      });
+    }
+
+    // Chat system
+    function showChatBubble(message) {
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble';
+      bubble.textContent = message || chatMessages[Math.floor(Math.random() * chatMessages.length)];
+
+      // Position bubble above cat
+      const catScreenX = cat.x - camera.x + cat.width / 2;
+      const catScreenY = cat.y - camera.y - 10;
+
+      bubble.style.left = catScreenX + 'px';
+      bubble.style.top = catScreenY + 'px';
+
+      document.body.appendChild(bubble);
+
+      // Fade in
+      setTimeout(() => bubble.classList.add('fade-in'), 50);
+
+      // Random meow chance
+      if (Math.random() < 0.6) {
+        setTimeout(() => playMeow(), 200);
+      }
+
+      // Remove after delay
+      setTimeout(() => {
+        bubble.classList.remove('fade-in');
+        setTimeout(() => bubble.remove(), 300);
+      }, 3000);
+    }
+
+    // Sound effects
+    function playMeow() {
+      if (settings.masterVolume === 0) return;
+
+      // Create simple meow sound using Web Audio API
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Meow-like frequency sweep
+        oscillator.frequency.setValueAtTime(400 + Math.random() * 200, audioContext.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(200 + Math.random() * 100, audioContext.currentTime + 0.3);
+
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(settings.masterVolume / 100 * 0.1, audioContext.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.4);
+      } catch (e) {
+        // Fallback for browsers without Web Audio API
+        console.log('Meow! 🐱');
+      }
+    }
+
+    // Rendering
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Day/night cycle
+      gameState.time += 0.001;
+      const dayProgress = (Math.sin(gameState.time) + 1) / 2;
+      const skyColor = interpolateColor('#87CEEB', '#1a1a2e', 1 - dayProgress);
+
+      // Sky gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, skyColor);
+      gradient.addColorStop(1, interpolateColor('#FFB6C1', '#2d1b69', 1 - dayProgress));
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Render parallax background layers
+      renderParallaxLayer('#8FBC8F', 0.2, -200); // Distant hills
+      renderParallaxLayer('#90EE90', 0.4, -100); // Middle hills
+
+      // Render world chunks
+      chunks.forEach(chunk => {
+        renderChunk(chunk);
+      });
+
+      // Render cat
+      renderCat();
+
+      // Render particles
+      if (settings.particleDensity > 0) {
+        renderParticles();
+      }
+    }
+
+    function renderParallaxLayer(color, parallaxFactor, yOffset) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.6;
+
+      const offsetX = camera.x * parallaxFactor;
+      for (let x = -200; x < canvas.width + 200; x += 50) {
+        const waveHeight = Math.sin((x + offsetX) * 0.01) * 30 + yOffset;
+        ctx.fillRect(x, canvas.height + waveHeight, 60, -waveHeight - yOffset);
+      }
+
+      ctx.globalAlpha = 1.0;
+    }
+
+    function renderChunk(chunk) {
+      for (let x = 0; x < CHUNK_SIZE; x++) {
+        const worldX = chunk.x * CHUNK_SIZE + x;
+        const screenX = worldX * TILE_SIZE - camera.x;
+
+        if (screenX < -TILE_SIZE || screenX > canvas.width + TILE_SIZE) continue;
+
+        const column = chunk.tiles[x];
+        if (!column) continue;
+
+        for (let y = 0; y < WORLD_HEIGHT; y++) {
+          const screenY = y * TILE_SIZE - camera.y;
+          const tile = column[y];
+
+          if (screenY < -TILE_SIZE || screenY > canvas.height + TILE_SIZE) continue;
+
+          // Render tile
+          switch (tile) {
+            case 'grass':
+              ctx.fillStyle = '#32CD32';
+              ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+              // Grass texture
+              ctx.fillStyle = '#228B22';
+              for (let i = 0; i < 3; i++) {
+                ctx.fillRect(screenX + i * 7, screenY, 2, 3);
+              }
+              break;
+            case 'dirt':
+              ctx.fillStyle = '#8B4513';
+              ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+              // Dirt texture
+              ctx.fillStyle = '#654321';
+              ctx.fillRect(screenX + 2, screenY + 2, 3, 3);
+              ctx.fillRect(screenX + 12, screenY + 8, 2, 2);
+              break;
+            case 'stone':
+              ctx.fillStyle = '#696969';
+              ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+              // Stone texture
+              ctx.fillStyle = '#556B2F';
+              ctx.fillRect(screenX + 1, screenY + 1, 18, 18);
+              break;
+            case 'water':
+              const waveOffset = Math.sin(gameState.time * 3 + worldX * 0.5) * 2;
+              ctx.fillStyle = 'rgba(64, 164, 223, 0.8)';
+              ctx.fillRect(screenX, screenY + waveOffset, TILE_SIZE, TILE_SIZE - waveOffset);
+              // Water shimmer
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+              ctx.fillRect(screenX, screenY + waveOffset, TILE_SIZE, 2);
+              break;
+            case 'vine':
+              ctx.fillStyle = '#228B22';
+              ctx.fillRect(screenX + 8, screenY, 4, TILE_SIZE);
+              // Vine leaves
+              ctx.fillStyle = '#32CD32';
+              if (y % 2 === 0) {
+                ctx.fillRect(screenX + 4, screenY + 5, 6, 6);
+                ctx.fillRect(screenX + 12, screenY + 12, 6, 6);
+              }
+              break;
+          }
+        }
+      }
+
+      // Render collectibles
+      chunk.collectibles.forEach(collectible => {
+        if (!collectible.collected) {
+          const screenX = collectible.x * TILE_SIZE - camera.x;
+          const screenY = collectible.y * TILE_SIZE - camera.y;
+
+          if (screenX > -30 && screenX < canvas.width + 30 && screenY > -30 && screenY < canvas.height + 30) {
+            // Floating animation
+            const floatOffset = Math.sin(gameState.time * 4 + collectible.x) * 3;
+
+            // Glow effect
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 10;
+            ctx.font = '20px Arial';
+            ctx.fillText(collectible.emoji, screenX, screenY + floatOffset);
+            ctx.shadowBlur = 0;
+
+            // Sparkle effect
+            if (Math.random() < 0.1) {
+              ctx.fillStyle = '#FFD700';
+              ctx.fillRect(screenX + Math.random() * 20 - 10, screenY + Math.random() * 20 - 10, 2, 2);
+            }
+          }
+        }
+      });
+
+      // Render decorations
+      chunk.decorations.forEach(decoration => {
+        const screenX = decoration.x * TILE_SIZE - camera.x;
+        const screenY = decoration.y * TILE_SIZE - camera.y;
+
+        if (screenX > -30 && screenX < canvas.width + 30 && screenY > -30 && screenY < canvas.height + 30) {
+          const sway = Math.sin(gameState.time * 2 + decoration.x * 0.1) * 2;
+          ctx.font = '16px Arial';
+          ctx.fillText(decoration.emoji, screenX + sway, screenY);
+        }
+      });
+    }
+
+    function renderCat() {
+      const screenX = cat.x - camera.x;
+      const screenY = cat.y - camera.y;
+
+      // Cat body
+      ctx.fillStyle = cat.swimming ? '#FF8C69' : '#FFA500';
+      if (cat.climbing) {
+        // Stretched climbing pose
+        ctx.fillRect(screenX, screenY, cat.width, cat.height + 4);
+      } else {
+        // Normal pose
+        const bounce = cat.grounded ? 0 : Math.sin(cat.animFrame) * 2;
+        ctx.fillRect(screenX, screenY + bounce, cat.width, cat.height);
+      }
+
+      // Cat ears
+      ctx.fillStyle = '#FF6347';
+      if (cat.facingRight) {
+        ctx.fillRect(screenX + 18, screenY - 2, 4, 6);
+        ctx.fillRect(screenX + 16, screenY, 4, 4);
+      } else {
+        ctx.fillRect(screenX + 2, screenY - 2, 4, 6);
+        ctx.fillRect(screenX + 4, screenY, 4, 4);
+      }
+
+      // Cat tail
+      const tailWag = Math.sin(gameState.time * 6) * (cat.idleTimer > 60 ? 8 : 3);
+      ctx.strokeStyle = '#FFA500';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      if (cat.facingRight) {
+        ctx.moveTo(screenX, screenY + 10);
+        ctx.quadraticCurveTo(screenX - 10, screenY + 5 + tailWag, screenX - 15, screenY - 5 + tailWag);
+      } else {
+        ctx.moveTo(screenX + cat.width, screenY + 10);
+        ctx.quadraticCurveTo(screenX + cat.width + 10, screenY + 5 + tailWag, screenX + cat.width + 15, screenY - 5 + tailWag);
+      }
+      ctx.stroke();
+
+      // Cat eyes
+      ctx.fillStyle = '#000';
+      if (cat.facingRight) {
+        ctx.fillRect(screenX + 18, screenY + 4, 2, 2);
+        if (cat.idleTimer > 120 && cat.idleTimer % 120 < 20) {
+          // Slow blink
+          ctx.fillRect(screenX + 18, screenY + 5, 2, 1);
+        }
+      } else {
+        ctx.fillRect(screenX + 4, screenY + 4, 2, 2);
+        if (cat.idleTimer > 120 && cat.idleTimer % 120 < 20) {
+          ctx.fillRect(screenX + 4, screenY + 5, 2, 1);
+        }
+      }
+
+      // Movement effects
+      if (Math.abs(cat.velX) > 0.1) {
+        // Walking dust
+        if (cat.grounded && Math.random() < 0.3) {
+          ctx.fillStyle = 'rgba(139, 69, 19, 0.5)';
+          ctx.fillRect(screenX + Math.random() * cat.width, screenY + cat.height, 2, 2);
+        }
+      }
+
+      if (cat.swimming) {
+        // Swimming ripples
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.arc(screenX + cat.width / 2, screenY + cat.height + 5, 10 + i * 8, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function renderParticles() {
+      // Simple particle system for atmosphere
+      if (Math.random() < settings.particleDensity / 100 * 0.02) {
+        const particles = ['✨', '🌸', '🍃'];
+        const particle = particles[Math.floor(Math.random() * particles.length)];
+
+        ctx.font = '12px Arial';
+        ctx.globalAlpha = 0.7;
+        ctx.fillText(
+          particle,
+          Math.random() * canvas.width,
+          Math.random() * canvas.height
+        );
+        ctx.globalAlpha = 1.0;
+      }
+    }
+
+    function interpolateColor(color1, color2, factor) {
+      const hex1 = color1.substring(1);
+      const hex2 = color2.substring(1);
+
+      const r1 = parseInt(hex1.substring(0, 2), 16);
+      const g1 = parseInt(hex1.substring(2, 4), 16);
+      const b1 = parseInt(hex1.substring(4, 6), 16);
+
+      const r2 = parseInt(hex2.substring(0, 2), 16);
+      const g2 = parseInt(hex2.substring(2, 4), 16);
+      const b2 = parseInt(hex2.substring(4, 6), 16);
+
+      const r = Math.round(r1 + (r2 - r1) * factor);
+      const g = Math.round(g1 + (g2 - g1) * factor);
+      const b = Math.round(b1 + (b2 - b1) * factor);
+
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // UI updates
+    function updateUI() {
+      document.getElementById('score').textContent = gameState.score;
+      document.getElementById('streak').textContent = gameState.streak;
+    }
+
+    // Settings
+    function openSettings() {
+      document.getElementById('settingsModal').style.display = 'flex';
+      document.getElementById('masterVolume').value = settings.masterVolume;
+      document.getElementById('asmrMode').checked = settings.asmrMode;
+      document.getElementById('particleDensity').value = settings.particleDensity;
+      document.getElementById('motionIntensity').value = settings.motionIntensity;
+      document.getElementById('worldSeed').value = gameState.seed.toFixed(0);
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').style.display = 'none';
+
+      // Apply settings
+      settings.masterVolume = parseInt(document.getElementById('masterVolume').value);
+      settings.asmrMode = document.getElementById('asmrMode').checked;
+      settings.particleDensity = parseInt(document.getElementById('particleDensity').value);
+      settings.motionIntensity = parseInt(document.getElementById('motionIntensity').value);
+
+      const newSeed = parseFloat(document.getElementById('worldSeed').value);
+      if (!isNaN(newSeed) && newSeed !== gameState.seed) {
+        gameState.seed = newSeed;
+        noise = new SimplexNoise(gameState.seed);
+        chunks.clear();
+        gameState.score = 0;
+        gameState.streak = 0;
+        updateUI();
+      }
+
+      // Save settings
+      localStorage.setItem('cozyCatSettings', JSON.stringify(settings));
+      localStorage.setItem('cozyCatGameState', JSON.stringify(gameState));
+    }
+
+    // Input handling
+    function handleKeyDown(e) {
+      keys[e.key] = true;
+      if (e.key === ' ') e.preventDefault();
+    }
+
+    function handleKeyUp(e) {
+      keys[e.key] = false;
+    }
+
+    // Mobile controls
+    function setupMobileControls() {
+      const leftBtn = document.getElementById('leftBtn');
+      const rightBtn = document.getElementById('rightBtn');
+      const jumpBtn = document.getElementById('jumpBtn');
+      const climbBtn = document.getElementById('climbBtn');
+
+      leftBtn.addEventListener('touchstart', () => mobileInput.left = true);
+      leftBtn.addEventListener('touchend', () => mobileInput.left = false);
+      leftBtn.addEventListener('mousedown', () => mobileInput.left = true);
+      leftBtn.addEventListener('mouseup', () => mobileInput.left = false);
+
+      rightBtn.addEventListener('touchstart', () => mobileInput.right = true);
+      rightBtn.addEventListener('touchend', () => mobileInput.right = false);
+      rightBtn.addEventListener('mousedown', () => mobileInput.right = true);
+      rightBtn.addEventListener('mouseup', () => mobileInput.right = false);
+
+      jumpBtn.addEventListener('touchstart', () => mobileInput.jump = true);
+      jumpBtn.addEventListener('touchend', () => mobileInput.jump = false);
+      jumpBtn.addEventListener('mousedown', () => mobileInput.jump = true);
+      jumpBtn.addEventListener('mouseup', () => mobileInput.jump = false);
+
+      climbBtn.addEventListener('touchstart', () => mobileInput.climb = true);
+      climbBtn.addEventListener('touchend', () => mobileInput.climb = false);
+      climbBtn.addEventListener('mousedown', () => mobileInput.climb = true);
+      climbBtn.addEventListener('mouseup', () => mobileInput.climb = false);
+
+      // Prevent context menu on long press
+      [leftBtn, rightBtn, jumpBtn, climbBtn].forEach(btn => {
+        btn.addEventListener('contextmenu', e => e.preventDefault());
+      });
+    }
+
+    // Main game loop
+    function gameLoop() {
+      updateChunks();
+      updatePhysics();
+      updateCollectibles();
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Initialize game
+    function init() {
+      canvas = document.getElementById('gameCanvas');
+      ctx = canvas.getContext('2d');
+
+      // Load saved data
+      const savedSettings = localStorage.getItem('cozyCatSettings');
+      if (savedSettings) {
+        Object.assign(settings, JSON.parse(savedSettings));
+      }
+
+      const savedGameState = localStorage.getItem('cozyCatGameState');
+      if (savedGameState) {
+        Object.assign(gameState, JSON.parse(savedGameState));
+        noise = new SimplexNoise(gameState.seed);
+      }
+
+      // Event listeners
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+
+      // Mobile controls
+      setupMobileControls();
+
+      // Responsive canvas
+      function resizeCanvas() {
+        const container = document.getElementById('gameContainer');
+        const aspectRatio = 1200 / 600;
+        let width = window.innerWidth - 40;
+        let height = window.innerHeight - 40;
+
+        if (width / height > aspectRatio) {
+          width = height * aspectRatio;
+        } else {
+          height = width / aspectRatio;
+        }
+
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+      }
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // FIXED: Generate initial chunks and place cat on ground
+      updateChunks();
+
+      // Find ground height at cat's starting position
+      const groundHeight = findGroundHeight(cat.x);
+      cat.y = groundHeight - cat.height;
+      cat.grounded = true;
+
+      updateUI();
+      gameLoop();
+
+      // Welcome message
+      setTimeout(() => {
+        showChatBubble("Let's explore together! 🌟");
+      }, 1000);
+    }
+
+    // Start the game
+    init();
+  </script>
+</body>
+
+</html>

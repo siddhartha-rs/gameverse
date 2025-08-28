@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Aim Trainer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Orbitron', monospace;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 50%, #0a0a0a 100%);
+      color: #00ffff;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      cursor: crosshair;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      z-index: 1000;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hud-item {
+      background: rgba(0, 255, 255, 0.1);
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      padding: 10px 20px;
+      margin: 5px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      text-shadow: 0 0 10px #00ffff;
+      font-weight: 700;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .game-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .target {
+      position: absolute;
+      border-radius: 50%;
+      cursor: pointer;
+      transform: scale(0);
+      animation: targetSpawn 0.3s ease-out forwards;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+      background: radial-gradient(circle at 30% 30%, #ff00ff, #8000ff, #4000ff);
+      border: 3px solid #ff00ff;
+    }
+
+    .target.square {
+      border-radius: 10%;
+    }
+
+    @keyframes targetSpawn {
+      0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes targetHit {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+
+    @keyframes targetMiss {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+    }
+
+    .target.hit {
+      animation: targetHit 0.4s ease-out forwards;
+    }
+
+    .target.miss {
+      animation: targetMiss 0.5s ease-out forwards;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #ff00ff;
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 10px #ff00ff;
+    }
+
+    @keyframes particle {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .menu h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      margin-bottom: 30px;
+      text-shadow: 0 0 30px #00ffff;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 30px #00ffff, 0 0 40px #00ffff;
+      }
+
+      to {
+        text-shadow: 0 0 50px #00ffff, 0 0 60px #00ffff;
+      }
+    }
+
+    .menu-button {
+      background: linear-gradient(45deg, #ff00ff, #8000ff);
+      border: none;
+      color: white;
+      padding: 15px 30px;
+      margin: 10px;
+      border-radius: 10px;
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+      min-width: 200px;
+    }
+
+    .menu-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+    }
+
+    .game-over {
+      text-align: center;
+    }
+
+    .game-over h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #ff6600;
+      text-shadow: 0 0 20px #ff6600;
+    }
+
+    .stats {
+      margin: 20px 0;
+      font-size: 1.2rem;
+    }
+
+    .stats div {
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 5px;
+      border: 1px solid #00ffff;
+    }
+
+    .countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5rem;
+      font-weight: 900;
+      z-index: 1500;
+      text-shadow: 0 0 30px #00ffff;
+      animation: countdownPulse 1s ease-in-out;
+    }
+
+    @keyframes countdownPulse {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+    }
+
+    .crosshair {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+    }
+
+    .crosshair::before,
+    .crosshair::after {
+      content: '';
+      position: absolute;
+      background: #00ffff;
+      box-shadow: 0 0 5px #00ffff;
+    }
+
+    .crosshair::before {
+      width: 20px;
+      height: 2px;
+      top: 9px;
+      left: 0;
+    }
+
+    .crosshair::after {
+      width: 2px;
+      height: 20px;
+      top: 0;
+      left: 9px;
+    }
+
+    @media (max-width: 768px) {
+      .hud {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 10px;
+      }
+
+      .hud-item {
+        padding: 8px 12px;
+        margin: 2px;
+        min-width: 80px;
+        font-size: 0.9rem;
+      }
+
+      body {
+        cursor: default;
+      }
+
+      .crosshair {
+        display: none;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="crosshair" id="crosshair"></div>
+
+    <div class="hud hidden" id="hud">
+      <div class="hud-item">Score: <span id="score">0</span></div>
+      <div class="hud-item">Time: <span id="time">30</span>s</div>
+      <div class="hud-item">Accuracy: <span id="accuracy">100</span>%</div>
+      <div class="hud-item">Combo: <span id="combo">0</span></div>
+    </div>
+
+    <div class="game-area" id="gameArea"></div>
+
+    <div class="menu" id="mainMenu">
+      <h1>PIXEL AIM TRAINER</h1>
+      <button class="menu-button" id="timeAttack30Btn">Time Attack (30s)</button>
+      <button class="menu-button" id="timeAttack60Btn">Time Attack (60s)</button>
+      <button class="menu-button" id="endlessModeBtn">Endless Mode</button>
+      <button class="menu-button" id="howToPlayBtn">How to Play</button>
+    </div>
+
+    <div class="menu hidden" id="howToPlayMenu">
+      <div class="game-over">
+        <h2>HOW TO PLAY</h2>
+        <div class="stats" style="text-align: left; max-width: 600px;">
+          <div><strong>🎯 OBJECTIVE</strong><br>Click or tap targets as quickly and accurately as possible!</div>
+          <div><strong>🖱️ DESKTOP CONTROLS</strong><br>• Move mouse to aim (crosshair follows)<br>• Left-click to shoot
+            targets<br>• Click empty space = miss</div>
+          <div><strong>📱 MOBILE CONTROLS</strong><br>• Tap directly on targets<br>• Tap empty space = miss</div>
+          <div><strong>⏱️ TIME ATTACK</strong><br>Hit as many targets as possible in 30 or 60 seconds</div>
+          <div><strong>♾️ ENDLESS MODE</strong><br>Keep going until you miss 3 times (3 lives)</div>
+          <div><strong>📈 DIFFICULTY SCALING</strong><br>• Targets get smaller as you progress<br>• Targets disappear
+            faster<br>• Build combos for bonus points!</div>
+          <div><strong>🏆 SCORING</strong><br>• +1 point per hit<br>• Combo bonus every 5 consecutive hits<br>• Track
+            your accuracy percentage</div>
+        </div>
+        <button class="menu-button" id="backToMenuBtn">Back to Menu</button>
+      </div>
+    </div>
+
+    <div class="menu hidden" id="gameOverMenu">
+      <div class="game-over">
+        <h2>GAME OVER</h2>
+        <div class="stats">
+          <div>Final Score: <span id="finalScore">0</span></div>
+          <div>Accuracy: <span id="finalAccuracy">0</span>%</div>
+          <div>Best Combo: <span id="bestCombo">0</span></div>
+          <div>Time Survived: <span id="timeSurvived">0</span>s</div>
+        </div>
+        <button class="menu-button" onclick="showMainMenu()">Main Menu</button>
+        <button class="menu-button" onclick="restartGame()">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class PixelAimTrainer {
+      constructor() {
+        this.score = 0;
+        this.hits = 0;
+        this.misses = 0;
+        this.combo = 0;
+        this.bestCombo = 0;
+        this.timeLeft = 30;
+        this.gameMode = 'timeAttack30';
+        this.isPlaying = false;
+        this.currentTarget = null;
+        this.targetTimeout = null;
+        this.gameTimer = null;
+        this.targetSize = 80;
+        this.targetDuration = 2000;
+        this.lives = 3;
+
+        this.gameArea = document.getElementById('gameArea');
+        this.setupEventListeners();
+        this.setupAudio();
+        this.updateCrosshair();
+      }
+
+      setupEventListeners() {
+        // Button event listeners with error handling
+        const addSafeListener = (id, callback) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.addEventListener('click', (e) => {
+              try {
+                e.preventDefault();
+                callback();
+              } catch (error) {
+                console.error(`Error in ${id} click handler:`, error);
+              }
+            });
+          }
+        };
+
+        addSafeListener('timeAttack30Btn', () => this.startGame('timeAttack30'));
+        addSafeListener('timeAttack60Btn', () => this.startGame('timeAttack60'));
+        addSafeListener('endlessModeBtn', () => this.startGame('endless'));
+        addSafeListener('howToPlayBtn', () => this.showHowToPlay());
+        addSafeListener('backToMenuBtn', () => this.showMainMenu());
+        addSafeListener('playAgainBtn', () => this.restartGame());
+        addSafeListener('mainMenuBtn', () => this.showMainMenu());
+
+        // Mouse movement for crosshair
+        document.addEventListener('mousemove', (e) => this.updateCrosshair(e));
+
+        // Prevent right-click menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Click outside target = miss
+        this.gameArea.addEventListener('click', (e) => {
+          if (this.isPlaying && e.target === this.gameArea) {
+            this.registerMiss();
+          }
+        });
+
+        // Touch events for mobile
+        document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+        document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+      }
+
+      setupAudio() {
+        // Create audio context for sound effects
+        this.audioContext = null;
+        try {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          console.log('Web Audio API not supported');
+        }
+      }
+
+      playSound(type) {
+        if (!this.audioContext) return;
+
+        const oscillator = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(this.audioContext.destination);
+
+        if (type === 'hit') {
+          oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1200, this.audioContext.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        } else if (type === 'miss') {
+          oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+        }
+
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.3);
+      }
+
+      updateCrosshair(e) {
+        if (window.innerWidth <= 768) return; // Hide on mobile
+
+        const crosshair = document.getElementById('crosshair');
+        if (e) {
+          crosshair.style.left = e.clientX + 'px';
+          crosshair.style.top = e.clientY + 'px';
+        }
+      }
+
+      startGame(mode) {
+        try {
+          // Clean up any previous game state
+          this.isPlaying = false;
+
+          if (this.gameTimer) {
+            clearInterval(this.gameTimer);
+            this.gameTimer = null;
+          }
+
+          this.clearCurrentTarget();
+
+          this.gameMode = mode;
+          this.resetGameStats();
+
+          // Set initial values based on mode
+          switch (mode) {
+            case 'timeAttack30':
+              this.timeLeft = 30;
+              break;
+            case 'timeAttack60':
+              this.timeLeft = 60;
+              break;
+            case 'endless':
+              this.timeLeft = 0;
+              this.lives = 3;
+              break;
+          }
+
+          // Hide menus and show HUD
+          const mainMenuEl = document.getElementById('mainMenu');
+          const gameOverEl = document.getElementById('gameOverMenu');
+          const hudEl = document.getElementById('hud');
+
+          if (mainMenuEl) mainMenuEl.classList.add('hidden');
+          if (gameOverEl) gameOverEl.classList.add('hidden');
+          if (hudEl) hudEl.classList.remove('hidden');
+
+          this.countdown(3, () => {
+            try {
+              this.isPlaying = true;
+              this.spawnTarget();
+              if (mode !== 'endless') {
+                this.startTimer();
+              }
+              this.updateHUD();
+            } catch (error) {
+              console.error('Error starting game loop:', error);
+              location.reload();
+            }
+          });
+
+          // Resume audio context
+          if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+          }
+
+        } catch (error) {
+          console.error('Error starting game:', error);
+          location.reload();
+        }
+      }
+
+      resetGameStats() {
+        this.score = 0;
+        this.hits = 0;
+        this.misses = 0;
+        this.combo = 0;
+        this.bestCombo = 0;
+        this.targetSize = 80;
+        this.targetDuration = 2000;
+        this.lives = 3;
+      }
+
+      countdown(count, callback) {
+        if (count <= 0) {
+          try {
+            callback();
+          } catch (error) {
+            console.error('Error in countdown callback:', error);
+            location.reload();
+          }
+          return;
+        }
+
+        try {
+          const countdownEl = document.createElement('div');
+          countdownEl.className = 'countdown';
+          countdownEl.textContent = count;
+          document.body.appendChild(countdownEl);
+
+          setTimeout(() => {
+            try {
+              countdownEl.remove();
+              this.countdown(count - 1, callback);
+            } catch (error) {
+              console.error('Error in countdown:', error);
+              location.reload();
+            }
+          }, 1000);
+        } catch (error) {
+          console.error('Error creating countdown:', error);
+          location.reload();
+        }
+      }
+
+      spawnTarget() {
+        if (!this.isPlaying) return;
+
+        try {
+          this.clearCurrentTarget();
+
+          const target = document.createElement('div');
+          target.className = Math.random() < 0.7 ? 'target' : 'target square';
+
+          // Dynamic sizing based on score
+          const size = Math.max(30, this.targetSize - Math.floor(this.score / 5) * 2);
+          target.style.width = size + 'px';
+          target.style.height = size + 'px';
+
+          // Random position (keep targets away from edges)
+          const margin = size / 2 + 20;
+          const x = margin + Math.random() * (window.innerWidth - size - 2 * margin);
+          const y = 80 + margin + Math.random() * (window.innerHeight - size - 2 * margin - 80);
+
+          target.style.left = x + 'px';
+          target.style.top = y + 'px';
+
+          // Add click handler with proper binding
+          const hitHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.hitTarget(target);
+          };
+
+          target.addEventListener('click', hitHandler);
+          target.addEventListener('touchend', hitHandler);
+
+          this.gameArea.appendChild(target);
+          this.currentTarget = target;
+
+          // Auto-miss after duration
+          const duration = Math.max(800, this.targetDuration - Math.floor(this.score / 3) * 50);
+          this.targetTimeout = setTimeout(() => {
+            try {
+              if (this.currentTarget === target && this.isPlaying) {
+                this.missTarget(target);
+              }
+            } catch (error) {
+              console.error('Error in target timeout:', error);
+            }
+          }, duration);
+
+        } catch (error) {
+          console.error('Error spawning target:', error);
+          if (this.isPlaying) {
+            this.endGame();
+          }
+        }
+      }
+
+      hitTarget(target) {
+        if (!this.isPlaying || this.currentTarget !== target) return;
+
+        clearTimeout(this.targetTimeout);
+        this.currentTarget = null;
+
+        target.classList.add('hit');
+        this.createParticles(target);
+        this.playSound('hit');
+
+        this.hits++;
+        this.combo++;
+        this.score += 1 + Math.floor(this.combo / 5); // Combo bonus
+        this.bestCombo = Math.max(this.bestCombo, this.combo);
+
+        setTimeout(() => target.remove(), 400);
+
+        this.updateHUD();
+
+        // Spawn next target after short delay
+        setTimeout(() => this.spawnTarget(), 300);
+      }
+
+      missTarget(target) {
+        if (!this.isPlaying) return;
+
+        clearTimeout(this.targetTimeout);
+        this.currentTarget = null;
+
+        target.classList.add('miss');
+        this.playSound('miss');
+
+        this.registerMiss();
+
+        setTimeout(() => target.remove(), 500);
+
+        // Spawn next target
+        setTimeout(() => this.spawnTarget(), 500);
+      }
+
+      registerMiss() {
+        if (!this.isPlaying) return;
+
+        this.misses++;
+        this.combo = 0;
+
+        if (this.gameMode === 'endless') {
+          this.lives--;
+          if (this.lives <= 0) {
+            this.endGame();
+            return;
+          }
+        }
+
+        this.updateHUD();
+      }
+
+      createParticles(target) {
+        const rect = target.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        for (let i = 0; i < 8; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.left = centerX + 'px';
+          particle.style.top = centerY + 'px';
+
+          const angle = (i / 8) * Math.PI * 2;
+          const velocity = 50 + Math.random() * 50;
+          const vx = Math.cos(angle) * velocity;
+          const vy = Math.sin(angle) * velocity;
+
+          particle.style.animation = 'particle 0.6s ease-out forwards';
+          particle.style.transform = `translate(${vx}px, ${vy}px)`;
+
+          document.body.appendChild(particle);
+          setTimeout(() => particle.remove(), 600);
+        }
+      }
+
+      clearCurrentTarget() {
+        try {
+          if (this.currentTarget) {
+            if (this.targetTimeout) {
+              clearTimeout(this.targetTimeout);
+              this.targetTimeout = null;
+            }
+            if (this.currentTarget.parentNode) {
+              this.currentTarget.remove();
+            }
+            this.currentTarget = null;
+          }
+        } catch (error) {
+          console.error('Error clearing target:', error);
+          this.currentTarget = null;
+          this.targetTimeout = null;
+        }
+      }
+
+      startTimer() {
+        if (this.gameTimer) {
+          clearInterval(this.gameTimer);
+        }
+
+        this.gameTimer = setInterval(() => {
+          try {
+            this.timeLeft--;
+            this.updateHUD();
+
+            if (this.timeLeft <= 0) {
+              this.endGame();
+            }
+          } catch (error) {
+            console.error('Error in timer:', error);
+            this.endGame();
+          }
+        }, 1000);
+      }
+
+      updateHUD() {
+        try {
+          const scoreEl = document.getElementById('score');
+          const comboEl = document.getElementById('combo');
+          const timeEl = document.getElementById('time');
+          const accuracyEl = document.getElementById('accuracy');
+
+          if (scoreEl) scoreEl.textContent = this.score;
+          if (comboEl) comboEl.textContent = this.combo;
+
+          if (timeEl) {
+            if (this.gameMode === 'endless') {
+              timeEl.textContent = this.lives + ' ❤';
+            } else {
+              timeEl.textContent = Math.max(0, this.timeLeft);
+            }
+          }
+
+          if (accuracyEl) {
+            const accuracy = this.hits + this.misses > 0 ?
+              Math.round((this.hits / (this.hits + this.misses)) * 100) : 100;
+            accuracyEl.textContent = accuracy;
+          }
+        } catch (error) {
+          console.error('Error updating HUD:', error);
+        }
+      }
+
+      endGame() {
+        try {
+          this.isPlaying = false;
+
+          // Clear timers safely
+          if (this.gameTimer) {
+            clearInterval(this.gameTimer);
+            this.gameTimer = null;
+          }
+
+          this.clearCurrentTarget();
+
+          // Show game over screen
+          const hudEl = document.getElementById('hud');
+          const gameOverEl = document.getElementById('gameOverMenu');
+
+          if (hudEl) hudEl.classList.add('hidden');
+          if (gameOverEl) gameOverEl.classList.remove('hidden');
+
+          // Update final stats safely
+          const accuracy = this.hits + this.misses > 0 ?
+            Math.round((this.hits / (this.hits + this.misses)) * 100) : 100;
+
+          const finalScoreEl = document.getElementById('finalScore');
+          const finalAccuracyEl = document.getElementById('finalAccuracy');
+          const bestComboEl = document.getElementById('bestCombo');
+          const timeSurvivedEl = document.getElementById('timeSurvived');
+
+          if (finalScoreEl) finalScoreEl.textContent = this.score;
+          if (finalAccuracyEl) finalAccuracyEl.textContent = accuracy;
+          if (bestComboEl) bestComboEl.textContent = this.bestCombo;
+
+          let timeText = '0';
+          if (this.gameMode === 'timeAttack30') {
+            timeText = Math.max(0, 30 - this.timeLeft) + 's';
+          } else if (this.gameMode === 'timeAttack60') {
+            timeText = Math.max(0, 60 - this.timeLeft) + 's';
+          } else if (this.gameMode === 'endless') {
+            timeText = this.hits + ' targets hit';
+          }
+
+          if (timeSurvivedEl) timeSurvivedEl.textContent = timeText;
+
+        } catch (error) {
+          console.error('Error in endGame:', error);
+          // Fallback: force reload
+          setTimeout(() => location.reload(), 1000);
+        }
+      }
+
+      showHowToPlay() {
+        try {
+          const mainMenuEl = document.getElementById('mainMenu');
+          const howToPlayEl = document.getElementById('howToPlayMenu');
+
+          if (mainMenuEl) mainMenuEl.classList.add('hidden');
+          if (howToPlayEl) howToPlayEl.classList.remove('hidden');
+        } catch (error) {
+          console.error('Error showing how to play:', error);
+        }
+      }
+
+      showMainMenu() {
+        try {
+          // Stop any active game
+          this.isPlaying = false;
+
+          if (this.gameTimer) {
+            clearInterval(this.gameTimer);
+            this.gameTimer = null;
+          }
+
+          this.clearCurrentTarget();
+
+          // Hide all other menus
+          const gameOverEl = document.getElementById('gameOverMenu');
+          const howToPlayEl = document.getElementById('howToPlayMenu');
+          const hudEl = document.getElementById('hud');
+          const mainMenuEl = document.getElementById('mainMenu');
+
+          if (gameOverEl) gameOverEl.classList.add('hidden');
+          if (howToPlayEl) howToPlayEl.classList.add('hidden');
+          if (hudEl) hudEl.classList.add('hidden');
+          if (mainMenuEl) mainMenuEl.classList.remove('hidden');
+
+        } catch (error) {
+          console.error('Error showing main menu:', error);
+          // Force reload as fallback
+          location.reload();
+        }
+      }
+
+      restartGame() {
+        try {
+          // Clean up current game state
+          this.isPlaying = false;
+
+          if (this.gameTimer) {
+            clearInterval(this.gameTimer);
+            this.gameTimer = null;
+          }
+
+          this.clearCurrentTarget();
+
+          // Hide all menus
+          const gameOverEl = document.getElementById('gameOverMenu');
+          const hudEl = document.getElementById('hud');
+
+          if (gameOverEl) gameOverEl.classList.add('hidden');
+          if (hudEl) hudEl.classList.remove('hidden');
+
+          // Start the same game mode again
+          this.startGame(this.gameMode);
+
+        } catch (error) {
+          console.error('Error restarting game:', error);
+          // Fallback: reload page
+          location.reload();
+        }
+      }
+    }
+
+    // Global error handler
+    window.addEventListener('error', function (e) {
+      console.error('Global error caught:', e.error);
+      // Show a simple error message and reload option
+      if (window.game && typeof window.game.showMainMenu === 'function') {
+        try {
+          window.game.showMainMenu();
+        } catch (err) {
+          console.error('Error showing main menu:', err);
+          location.reload();
+        }
+      } else {
+        location.reload();
+      }
+    });
+
+    // Initialize game when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        window.game = new PixelAimTrainer();
+        console.log('Pixel Aim Trainer initialized successfully');
+      } catch (error) {
+        console.error('Error initializing game:', error);
+      }
+    });
+
+    // Fallback initialization if DOMContentLoaded already fired
+    if (document.readyState === 'loading') {
+      // DOM is still loading, wait for DOMContentLoaded
+    } else {
+      // DOM is already loaded
+      try {
+        window.game = new PixelAimTrainer();
+        console.log('Pixel Aim Trainer initialized successfully (fallback)');
+      } catch (error) {
+        console.error('Error initializing game (fallback):', error);
+      }
+    }
+  </script>
+</body>
+
+</html>

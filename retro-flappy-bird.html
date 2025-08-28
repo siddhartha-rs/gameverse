@@ -99,7 +99,8 @@
     }
 
     .game-over,
-    .start-screen {
+    .start-screen,
+    .countdown-screen {
       position: absolute;
       top: 0;
       left: 0;
@@ -113,6 +114,34 @@
       color: white;
       text-align: center;
       pointer-events: all;
+    }
+
+    .countdown-screen {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .countdown-number {
+      font-size: 4rem;
+      color: #FFD700;
+      text-shadow: 3px 3px 0px #000;
+      animation: pulse 0.3s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     .game-over h2,
@@ -211,6 +240,10 @@
       .instructions {
         font-size: 0.4rem;
       }
+
+      .countdown-number {
+        font-size: 3rem;
+      }
     }
 
     .particle {
@@ -243,6 +276,10 @@
         <div class="high-score" id="highScoreStart">High Score: 0</div>
       </div>
 
+      <div class="countdown-screen hidden" id="countdownScreen">
+        <div class="countdown-number" id="countdownNumber">3</div>
+      </div>
+
       <div class="game-over hidden" id="gameOverScreen">
         <h2>GAME OVER</h2>
         <p id="finalScore">Score: 0</p>
@@ -268,15 +305,17 @@
     canvas.height = container.clientHeight;
 
     // Game state
-    let gameState = 'start'; // 'start', 'playing', 'gameOver'
+    let gameState = 'start'; // 'start', 'countdown', 'playing', 'gameOver'
     let score = 0;
     let highScore = localStorage.getItem('flappyHighScore') || 0;
     let soundEnabled = localStorage.getItem('flappySoundEnabled') !== 'false';
+    let countdownTimer = 0;
+    let countdownValue = 3;
 
     // Game objects
     let bird = {
       x: canvas.width * 0.2,
-      y: canvas.height / 2,
+      y: canvas.height * 0.4, // Changed from 0.5 to 0.4 to start higher
       width: 24,
       height: 24,
       velocity: 0,
@@ -332,6 +371,17 @@
       createRetroSound(400, 0.2);
       setTimeout(() => createRetroSound(350, 0.2), 200);
       setTimeout(() => createRetroSound(300, 0.3), 400);
+    }
+
+    function playCountdownSound() {
+      // Countdown beep
+      createRetroSound(800, 0.1);
+    }
+
+    function playStartSound() {
+      // Start game sound
+      createRetroSound(600, 0.15);
+      setTimeout(() => createRetroSound(800, 0.2), 150);
     }
 
     // Initialize high score display
@@ -421,6 +471,51 @@
       });
     }
 
+    // Countdown logic
+    function startCountdown() {
+      gameState = 'countdown';
+      countdownValue = 3;
+      countdownTimer = 0;
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('countdownScreen').classList.remove('hidden');
+      updateCountdownDisplay();
+    }
+
+    function updateCountdownDisplay() {
+      const countdownElement = document.getElementById('countdownNumber');
+      if (countdownValue > 0) {
+        countdownElement.textContent = countdownValue;
+        playCountdownSound();
+      } else {
+        countdownElement.textContent = 'GO!';
+        playStartSound();
+      }
+
+      // Trigger animation
+      countdownElement.style.animation = 'none';
+      setTimeout(() => {
+        countdownElement.style.animation = 'pulse 0.3s ease-in-out';
+      }, 10);
+    }
+
+    function updateCountdown() {
+      countdownTimer++;
+      if (countdownTimer >= 60) { // 1 second at 60fps
+        countdownTimer = 0;
+        countdownValue--;
+
+        if (countdownValue >= 0) {
+          updateCountdownDisplay();
+        }
+
+        if (countdownValue < 0) {
+          // Start the actual game
+          gameState = 'playing';
+          document.getElementById('countdownScreen').classList.add('hidden');
+        }
+      }
+    }
+
     // Game logic
     function updateBird() {
       bird.velocity += bird.gravity;
@@ -486,14 +581,14 @@
     }
 
     function startGame() {
-      gameState = 'playing';
       score = 0;
-      bird.y = canvas.height / 2;
+      bird.y = canvas.height * 0.4; // Reset bird to higher position
       bird.velocity = 0;
+      bird.rotation = 0;
       pipes = [];
       particles = [];
       document.getElementById('score').textContent = score;
-      document.getElementById('startScreen').classList.add('hidden');
+      startCountdown();
     }
 
     function gameOver() {
@@ -519,7 +614,7 @@
     function resetGame() {
       gameState = 'start';
       score = 0;
-      bird.y = canvas.height / 2;
+      bird.y = canvas.height * 0.4; // Reset bird to higher position
       bird.velocity = 0;
       bird.rotation = 0;
       pipes = [];
@@ -540,7 +635,9 @@
       ctx.fillStyle = '#DED895';
       ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height * 0.25);
 
-      if (gameState === 'playing') {
+      if (gameState === 'countdown') {
+        updateCountdown();
+      } else if (gameState === 'playing') {
         updateBird();
         updatePipes();
         updateParticles();
@@ -602,8 +699,8 @@
       canvas.width = container.clientWidth;
       canvas.height = container.clientHeight;
       bird.x = canvas.width * 0.2;
-      if (gameState === 'start') {
-        bird.y = canvas.height / 2;
+      if (gameState === 'start' || gameState === 'countdown') {
+        bird.y = canvas.height * 0.4; // Use higher position
       }
     });
 
