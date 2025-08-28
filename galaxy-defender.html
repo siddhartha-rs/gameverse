@@ -63,11 +63,27 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background: rgba(0, 20, 40, 0.8);
-      backdrop-filter: blur(10px);
-      padding: 15px;
+      background: rgba(0, 20, 40, 0.3);
+      backdrop-filter: blur(5px);
+      padding: 12px;
       border-radius: 8px;
-      border: 1px solid rgba(0, 255, 136, 0.3);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      transition: opacity 0.3s ease;
+    }
+
+    /* Make UI more transparent on mobile when game is active */
+    @media (max-width: 768px) {
+      .ui-panel {
+        background: rgba(0, 20, 40, 0.15);
+        backdrop-filter: blur(3px);
+        border: 1px solid rgba(0, 255, 136, 0.15);
+        padding: 8px;
+      }
+
+      .ui-panel:hover {
+        background: rgba(0, 20, 40, 0.4);
+        backdrop-filter: blur(8px);
+      }
     }
 
     .ui-score,
@@ -75,6 +91,7 @@
     .ui-wave {
       font-size: 18px;
       color: #00ff88;
+      text-shadow: 0 0 10px #00ff88;
     }
 
     .ui-lives {
@@ -83,26 +100,45 @@
       margin-top: 5px;
     }
 
+    /* Heart-shaped life icons */
     .life-icon {
-      width: 22px;
-      height: 22px;
-      background: linear-gradient(45deg, #00ff88, #00ccaa);
-      border-radius: 50%;
-      box-shadow: 0 0 8px #00ff88;
+      position: relative;
+      width: 20px;
+      height: 18px;
+      transform: rotate(-45deg);
       animation: pulse-life 2s infinite;
+    }
+
+    .life-icon::before,
+    .life-icon::after {
+      content: '';
+      width: 10px;
+      height: 16px;
+      position: absolute;
+      left: 10px;
+      top: 0;
+      background: linear-gradient(45deg, #ff1744, #ff6b9d);
+      border-radius: 10px 10px 0 0;
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+      box-shadow: 0 0 8px #ff1744;
+    }
+
+    .life-icon::after {
+      left: 0;
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
     }
 
     @keyframes pulse-life {
 
       0%,
       100% {
-        transform: scale(1);
-        box-shadow: 0 0 8px #00ff88;
+        transform: rotate(-45deg) scale(1);
       }
 
       50% {
-        transform: scale(1.1);
-        box-shadow: 0 0 12px #00ff88;
+        transform: rotate(-45deg) scale(1.1);
       }
     }
 
@@ -378,14 +414,14 @@
       }
 
       .ui-panel {
-        padding: 12px;
-        font-size: 14px;
+        padding: 8px;
+        font-size: 12px;
       }
 
       .ui-score,
       .ui-level,
       .ui-wave {
-        font-size: 16px;
+        font-size: 14px;
       }
     }
 
@@ -405,14 +441,14 @@
       }
 
       .ui-panel {
-        padding: 10px;
-        font-size: 12px;
+        padding: 6px;
+        font-size: 11px;
       }
 
       .ui-score,
       .ui-level,
       .ui-wave {
-        font-size: 14px;
+        font-size: 13px;
       }
 
       #soundToggle,
@@ -502,7 +538,7 @@
       <button id="howToPlayButton" class="button">Intel Briefing</button>
       <div class="controls-section">
         Defend humanity's last frontier against the alien invasion!<br>
-        Multiple enemy types • Progressive difficulty • Combo system
+        Multiple alien types • Progressive difficulty • Combo system
       </div>
     </div>
 
@@ -517,7 +553,7 @@
         </div>
 
         <div class="instructions-section">
-          <h3>Enemy Intel</h3>
+          <h3>Alien Intel</h3>
           <div class="enemy-showcase">
             <div class="enemy-type">
               <div class="enemy-icon basic-enemy"></div>
@@ -551,8 +587,8 @@
           <h3>Advanced Tactics</h3>
           <p>• Rapid consecutive kills increase your combo multiplier</p>
           <p>• Let weapons cool down to avoid overheating</p>
-          <p>• Different enemies have unique movement patterns</p>
-          <p>• Boss enemies appear every few waves - prepare for intense battles!</p>
+          <p>• Different aliens have unique movement patterns</p>
+          <p>• Boss aliens appear every few waves - prepare for intense battles!</p>
         </div>
       </div>
       <button id="backButton" class="button">Return to Base</button>
@@ -628,7 +664,8 @@
         health: 1,
         points: 100,
         size: 1,
-        spawnWeight: 0.6
+        spawnWeight: 0.6,
+        type: 'scout'
       },
       INTERCEPTOR: {
         color: '#00ff00',
@@ -636,7 +673,8 @@
         health: 1,
         points: 200,
         size: 0.8,
-        spawnWeight: 0.25
+        spawnWeight: 0.25,
+        type: 'interceptor'
       },
       HEAVY: {
         color: '#8800ff',
@@ -644,7 +682,8 @@
         health: 3,
         points: 300,
         size: 1.4,
-        spawnWeight: 0.1
+        spawnWeight: 0.1,
+        type: 'heavy'
       },
       BOSS: {
         color: '#ff0066',
@@ -652,7 +691,8 @@
         health: 10,
         points: 1000,
         size: 2,
-        spawnWeight: 0.05
+        spawnWeight: 0.05,
+        type: 'boss'
       }
     };
 
@@ -1016,50 +1056,226 @@
         this.points = type.points;
         this.active = true;
         this.color = type.color;
+        this.alienType = type.type;
+        this.animationTime = Math.random() * Math.PI * 2;
       }
 
       update(deltaTime) {
         this.y += this.speed * deltaTime;
+        this.animationTime += deltaTime * 3;
+
+        // Add slight side-to-side movement for some alien types
+        if (this.alienType === 'interceptor') {
+          this.x += Math.sin(this.animationTime) * 30 * deltaTime;
+        }
+
         if (this.y > canvas.height + this.height) {
           this.active = false;
         }
       }
 
-      draw() {
+      drawAlien() {
         ctx.save();
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
 
-        // Enemy body
+        // Different alien designs based on type
+        switch (this.alienType) {
+          case 'scout':
+            this.drawScoutAlien();
+            break;
+          case 'interceptor':
+            this.drawInterceptorAlien();
+            break;
+          case 'heavy':
+            this.drawHeavyAlien();
+            break;
+          case 'boss':
+            this.drawBossAlien();
+            break;
+        }
+
+        ctx.restore();
+      }
+
+      drawScoutAlien() {
+        // Classic alien head shape
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.moveTo(0, -this.height / 2);
-        ctx.lineTo(this.width / 2, this.height / 2);
-        ctx.lineTo(-this.width / 2, this.height / 2);
+        ctx.ellipse(0, -5, this.width * 0.4, this.height * 0.3, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body
+        ctx.beginPath();
+        ctx.ellipse(0, 5, this.width * 0.3, this.height * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-this.width * 0.15, -8, 4, 0, Math.PI * 2);
+        ctx.arc(this.width * 0.15, -8, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye pupils with animation
+        ctx.fillStyle = '#000000';
+        const pupilOffset = Math.sin(this.animationTime) * 1;
+        ctx.beginPath();
+        ctx.arc(-this.width * 0.15 + pupilOffset, -8, 2, 0, Math.PI * 2);
+        ctx.arc(this.width * 0.15 + pupilOffset, -8, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Antennae
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-this.width * 0.2, -this.height * 0.3);
+        ctx.lineTo(-this.width * 0.3, -this.height * 0.5);
+        ctx.moveTo(this.width * 0.2, -this.height * 0.3);
+        ctx.lineTo(this.width * 0.3, -this.height * 0.5);
+        ctx.stroke();
+      }
+
+      drawInterceptorAlien() {
+        // Sleek, angular alien
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(0, -this.height * 0.4);
+        ctx.lineTo(-this.width * 0.3, -this.height * 0.1);
+        ctx.lineTo(-this.width * 0.2, this.height * 0.4);
+        ctx.lineTo(this.width * 0.2, this.height * 0.4);
+        ctx.lineTo(this.width * 0.3, -this.height * 0.1);
         ctx.closePath();
         ctx.fill();
 
-        // Enemy details based on type
-        if (this.type === ENEMY_TYPES.HEAVY || this.type === ENEMY_TYPES.BOSS) {
-          ctx.fillStyle = '#000';
+        // Glowing eyes
+        const eyeGlow = ctx.createRadialGradient(0, -5, 0, 0, -5, 8);
+        eyeGlow.addColorStop(0, '#ff0000');
+        eyeGlow.addColorStop(1, 'rgba(255, 0, 0, 0)');
+        ctx.fillStyle = eyeGlow;
+        ctx.beginPath();
+        ctx.arc(-this.width * 0.1, -5, 3, 0, Math.PI * 2);
+        ctx.arc(this.width * 0.1, -5, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Wings with animation
+        const wingFlap = Math.sin(this.animationTime * 2) * 0.1 + 0.9;
+        ctx.fillStyle = `rgba(0, 255, 0, 0.6)`;
+        ctx.beginPath();
+        ctx.ellipse(-this.width * 0.35, 0, this.width * 0.2 * wingFlap, this.height * 0.1, -0.3, 0, Math.PI * 2);
+        ctx.ellipse(this.width * 0.35, 0, this.width * 0.2 * wingFlap, this.height * 0.1, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      drawHeavyAlien() {
+        // Tank-like alien
+        ctx.fillStyle = this.color;
+
+        // Main body
+        ctx.beginPath();
+        ctx.roundRect(-this.width * 0.4, -this.height * 0.3, this.width * 0.8, this.height * 0.6, 5);
+        ctx.fill();
+
+        // Armor plates
+        ctx.fillStyle = '#666666';
+        for (let i = 0; i < 3; i++) {
           ctx.beginPath();
-          ctx.arc(0, 0, this.width / 4, 0, Math.PI * 2);
+          ctx.roundRect(-this.width * 0.35 + i * this.width * 0.12, -this.height * 0.25, this.width * 0.1, this.height * 0.5, 2);
           ctx.fill();
         }
 
+        // Multiple eyes
+        ctx.fillStyle = '#ff0000';
+        for (let i = 0; i < 4; i++) {
+          const eyeX = -this.width * 0.25 + (i * this.width * 0.17);
+          const eyeY = -this.height * 0.1 + Math.sin(this.animationTime + i) * 2;
+          ctx.beginPath();
+          ctx.arc(eyeX, eyeY, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Weapon barrels
+        ctx.fillStyle = '#333333';
+        ctx.beginPath();
+        ctx.rect(-this.width * 0.1, this.height * 0.2, this.width * 0.08, this.height * 0.3);
+        ctx.rect(this.width * 0.02, this.height * 0.2, this.width * 0.08, this.height * 0.3);
+        ctx.fill();
+      }
+
+      drawBossAlien() {
+        // Large, menacing boss alien
+        const pulsate = 1 + Math.sin(this.animationTime) * 0.1;
+
+        ctx.save();
+        ctx.scale(pulsate, pulsate);
+
+        // Main body with gradient
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width * 0.5);
+        gradient.addColorStop(0, this.color);
+        gradient.addColorStop(1, '#330022');
+        ctx.fillStyle = gradient;
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.width * 0.45, this.height * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tentacles
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 4;
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          const tentacleLength = this.height * 0.6;
+          const waveOffset = Math.sin(this.animationTime * 2 + i) * 10;
+
+          ctx.beginPath();
+          ctx.moveTo(
+            Math.cos(angle) * this.width * 0.3,
+            Math.sin(angle) * this.height * 0.3
+          );
+          ctx.quadraticCurveTo(
+            Math.cos(angle) * (this.width * 0.4 + waveOffset),
+            Math.sin(angle) * (this.height * 0.4 + waveOffset),
+            Math.cos(angle) * (this.width * 0.3 + tentacleLength),
+            Math.sin(angle) * (this.height * 0.3 + tentacleLength)
+          );
+          ctx.stroke();
+        }
+
+        // Large central eye
+        const eyeGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
+        eyeGlow.addColorStop(0, '#ffffff');
+        eyeGlow.addColorStop(0.3, '#ff0000');
+        eyeGlow.addColorStop(1, 'rgba(255, 0, 0, 0)');
+        ctx.fillStyle = eyeGlow;
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye pupil
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(Math.sin(this.animationTime) * 2, Math.cos(this.animationTime) * 2, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      draw() {
+        this.drawAlien();
+
         // Health bar for enemies with more than 1 health
         if (this.maxHealth > 1) {
+          ctx.save();
           const barWidth = this.width;
           const barHeight = 3;
           const healthPercent = this.health / this.maxHealth;
 
           ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-          ctx.fillRect(-barWidth / 2, -this.height / 2 - 8, barWidth, barHeight);
+          ctx.fillRect(this.x, this.y - 10, barWidth, barHeight);
 
           ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
-          ctx.fillRect(-barWidth / 2, -this.height / 2 - 8, barWidth * healthPercent, barHeight);
+          ctx.fillRect(this.x, this.y - 10, barWidth * healthPercent, barHeight);
+          ctx.restore();
         }
-
-        ctx.restore();
       }
     }
 
