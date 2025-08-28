@@ -13,6 +13,7 @@
       padding: 0;
       box-sizing: border-box;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -64,6 +65,7 @@
       flex: 1;
       position: relative;
       overflow: hidden;
+      touch-action: manipulation;
     }
 
     .target {
@@ -177,6 +179,8 @@
       margin-bottom: 30px;
       text-shadow: 0 0 30px #00ffff;
       animation: glow 2s ease-in-out infinite alternate;
+      text-align: center;
+      width: 100%;
     }
 
     @keyframes glow {
@@ -203,6 +207,7 @@
       transition: all 0.3s ease;
       box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
       min-width: 200px;
+      touch-action: manipulation;
     }
 
     .menu-button:hover {
@@ -310,6 +315,12 @@
       .crosshair {
         display: none;
       }
+
+      .menu-button {
+        padding: 20px 30px;
+        min-width: 250px;
+        font-size: 20px;
+      }
     }
 
     .hidden {
@@ -367,8 +378,8 @@
           <div>Best Combo: <span id="bestCombo">0</span></div>
           <div>Time Survived: <span id="timeSurvived">0</span>s</div>
         </div>
-        <button class="menu-button" onclick="showMainMenu()">Main Menu</button>
-        <button class="menu-button" onclick="restartGame()">Play Again</button>
+        <button class="menu-button" id="mainMenuBtn">Main Menu</button>
+        <button class="menu-button" id="playAgainBtn">Play Again</button>
       </div>
     </div>
   </div>
@@ -402,12 +413,23 @@
         const addSafeListener = (id, callback) => {
           const element = document.getElementById(id);
           if (element) {
+            // Add both click and touch events for mobile compatibility
             element.addEventListener('click', (e) => {
               try {
                 e.preventDefault();
                 callback();
               } catch (error) {
                 console.error(`Error in ${id} click handler:`, error);
+              }
+            });
+
+            // Add touch event for mobile
+            element.addEventListener('touchend', (e) => {
+              try {
+                e.preventDefault();
+                callback();
+              } catch (error) {
+                console.error(`Error in ${id} touch handler:`, error);
               }
             });
           }
@@ -435,8 +457,12 @@
         });
 
         // Touch events for mobile
-        document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
-        document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+        this.gameArea.addEventListener('touchend', (e) => {
+          if (this.isPlaying && e.target === this.gameArea) {
+            e.preventDefault();
+            this.registerMiss();
+          }
+        });
       }
 
       setupAudio() {
